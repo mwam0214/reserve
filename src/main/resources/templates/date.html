@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date</title>
+    <link rel="stylesheet" th:href="@{/css/date.css}">
+</head>
+<body>
+<h1 th:text="${#temporals.format(date, 'yyyy年MM月dd日')}"></h1>
+<h2>予約したい時間を下記から選択してください。</h2>
+
+<form th:action="@{/reserve}" method="post">
+    <label>時間</label>
+    <input type="time" name="time" step="1800" list="data-list" min="10:00" max="21:00" required>
+    <datalist id="data-list">
+        <!-- 予約可能な時間帯を動的に生成 -->
+        <option th:each="time : ${availableTimes}" th:value="${time}" th:text="${time}"></option>
+    </datalist>
+
+    <label>メニュー</label>
+    <select name="menu" required>
+        <option>全身</option>
+        <option>頭</option>
+        <option>手</option>
+        <option>足裏</option>
+    </select>
+
+    <br>
+    <h2>お客さま情報</h2>
+    <label>氏名</label>
+    <input type="text" name="name" required>
+    <label>メールアドレス</label>
+    <input type="email" name="email" style="width: 200px;" required>
+    <label>電話番号</label>
+    <input type="tel" name="tel" required>
+    <input type="submit" value="予約する">
+</form>
+
+
+<h4>
+    <a th:href="@{/}">日付選択画面へ戻る</a>
+</h4>
+</body>
+</html>
