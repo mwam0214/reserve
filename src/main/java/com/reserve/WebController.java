@@ -32,7 +32,7 @@ public class WebController {
     //////グローバル変数///////////////////////////////////////////////////////////////////////////
     LocalDate localDate = LocalDate.now();
     //        予約可能なのは当日より2日後の日付から
-    LocalDate reserveDays = localDate.plusDays(1);
+    LocalDate reserveDays = localDate.plusDays(2);
 
     //    Formで日付を取得し、date.htmlに遷移させる。
     LocalDate date;
