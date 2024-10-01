@@ -15,7 +15,7 @@
     <input type="time" name="time" step="1800" list="data-list" min="10:00" max="21:00" required>
     <datalist id="data-list">
         <!-- 予約可能な時間帯を動的に生成 -->
-        <option th:each="time : ${availableTimes}" th:value="${time}" th:text="${time}" th:if="${!bookedTimes.contains(time)}"></option>
+        <option th:each="time : ${availableTimes}" th:value="${time}" th:text="${time}" ></option>
     </datalist>
 
     <label>メニュー</label>
