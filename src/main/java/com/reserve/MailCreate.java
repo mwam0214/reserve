@@ -1,14 +1,23 @@
 package com.reserve;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MailCreate {
-    private MailSender mailSender;
-    MailCreate(MailSender mailSender) {
+        private final MailSender mailSender;
+
+    @Autowired
+    public MailCreate(MailSender mailSender) {
         this.mailSender = mailSender;
     }
+    // private MailSender mailSender;
+    // MailCreate(MailSender mailSender) {
+    //     this.mailSender = mailSender;
+    // }
 
     //        予約完了時に予約情報をメールアドレスに送信する
     SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
