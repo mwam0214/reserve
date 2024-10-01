@@ -55,7 +55,7 @@ public class WebController {
 
     // List<ReserveDate> reserveDates = new ArrayList<>();
 
-    List<LocalTime> ReserveTimeList(DayOfWeek dayOfWeek) {
+    private List<LocalTime> getReserveTimeList(DayOfWeek dayOfWeek) {
         switch (dayOfWeek) {
             case MONDAY:
                 return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0));
@@ -80,14 +80,14 @@ public class WebController {
 
     List<ReserveDate> reserveDates = new ArrayList<>();
 
-    // public void setReserveDates(LocalDate date) {
-    //     DayOfWeek dayOfWeek = date.getDayOfWeek();
-    //     List<LocalTime> reserveTimeList = getReserveTimeList(dayOfWeek);
+    public void setReserveDates(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        List<LocalTime> reserveTimeList = getReserveTimeList(dayOfWeek);
         
-    //     for (LocalTime time : reserveTimeList) {
-    //         reserveDates.add(new ReserveDate(date, time));
-    //     }
-    // }
+        for (LocalTime time : reserveTimeList) {
+            reserveDates.add(new ReserveDate(date, time));
+        }
+    }
 
 
 
@@ -110,10 +110,10 @@ public class WebController {
         model.addAttribute("date", date);
         reserveDates = dao.search(date);
         model.addAttribute("circle", reserveDates);
-        // model.addAttribute("timeList", ReserveTimeList);
+        model.addAttribute("timeList", getReserveTimeList(null));
 
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        List<LocalTime> reserveTimeList = ReserveTimeList(dayOfWeek);
+        List<LocalTime> reserveTimeList = getReserveTimeList(dayOfWeek);
 
         // 予約済み時間を取得
         List<LocalTime> bookedTimes = new ArrayList<>();
