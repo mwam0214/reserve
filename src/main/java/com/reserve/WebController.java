@@ -5,7 +5,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.time.DayOfWeek;
 
 import org.springframework.mail.MailSender;
 import org.springframework.stereotype.Controller;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WebController {
     private final WebDao dao;
     private final MailSender mailSender;
-    private List<LocalTime> reserveTimeList;
-
   
 
     WebController(WebDao dao, MailSender mailSender) {
@@ -34,62 +31,24 @@ public class WebController {
 
     //    Formで日付を取得し、date.htmlに遷移させる。
     LocalDate date;
-    // LocalTime[] reserveTimeList = {
-    //         LocalTime.of(10, 0),
-    //         LocalTime.of(11, 0),
-    //         LocalTime.of(12, 0),
-    //         LocalTime.of(13, 0),
-    //         LocalTime.of(14, 0),
-    //         LocalTime.of(15, 0),
-    //         LocalTime.of(16, 0),
-    //         LocalTime.of(17, 0),
-    //         LocalTime.of(18, 0),
-    //         LocalTime.of(19, 0),
-    //         LocalTime.of(20, 0),
-    //         LocalTime.of(21, 0)
-    //     };
-
-
-    // record ReserveDate(LocalDate date, LocalTime time) {
-    // }
-
-    // List<ReserveDate> reserveDates = new ArrayList<>();
-
-    private List<LocalTime> getReserveTimeList(DayOfWeek dayOfWeek) {
-        switch (dayOfWeek) {
-            case MONDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0));
-            case TUESDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0));
-            case WEDNESDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0), LocalTime.of(14, 0));
-            case THURSDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0), LocalTime.of(14, 0), LocalTime.of(15, 0));
-            case FRIDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0), LocalTime.of(14, 0), LocalTime.of(15, 0), LocalTime.of(16, 0));
-            case SATURDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0), LocalTime.of(14, 0), LocalTime.of(15, 0), LocalTime.of(16, 0), LocalTime.of(17, 0));
-            case SUNDAY:
-                return List.of(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0), LocalTime.of(13, 0), LocalTime.of(14, 0), LocalTime.of(15, 0), LocalTime.of(16, 0), LocalTime.of(17, 0), LocalTime.of(18, 0));
-            default:
-                return List.of();
-        }
+    LocalTime[] reserveTimeList = {
+            LocalTime.of(10, 0),
+            LocalTime.of(11, 0),
+            LocalTime.of(12, 0),
+            LocalTime.of(13, 0),
+            LocalTime.of(14, 0),
+            LocalTime.of(15, 0),
+            LocalTime.of(16, 0),
+            LocalTime.of(17, 0),
+            LocalTime.of(18, 0),
+            LocalTime.of(19, 0),
+            LocalTime.of(20, 0),
+            LocalTime.of(21, 0)
+        };
+    record ReserveDate(LocalDate date, LocalTime time) {
     }
-
-    record ReserveDate(LocalDate date, LocalTime time) {}
 
     List<ReserveDate> reserveDates = new ArrayList<>();
-
-    public void setReserveDates(LocalDate date) {
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        List<LocalTime> reserveTimeList = getReserveTimeList(dayOfWeek);
-        
-        for (LocalTime time : reserveTimeList) {
-            reserveDates.add(new ReserveDate(date, time));
-        }
-    }
-
-
 
 
 
@@ -110,10 +69,8 @@ public class WebController {
         model.addAttribute("date", date);
         reserveDates = dao.search(date);
         model.addAttribute("circle", reserveDates);
-        model.addAttribute("timeList", getReserveTimeList(null));
+        model.addAttribute("timeList", reserveTimeList);
 
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        List<LocalTime> reserveTimeList = getReserveTimeList(dayOfWeek);
 
         // 予約済み時間を取得
         List<LocalTime> bookedTimes = new ArrayList<>();
@@ -184,51 +141,31 @@ public class WebController {
         List<LocalTime> judge = new ArrayList<>();
 //        ユーザに選択された日付とDBにある日付が同じ時、reserveTimeListと同じ時間がある場合にjudge配列に時間を追加
 //        reserveDatesの中身がnullの場合、judgeの中身もnullになる
-        // for (int i = 0; i < reserveDates.size(); i++) {
-        //     if (date.isEqual(reserveDates.get(i).date)) {
-        //         for (int j = 0; j < reserveTimeList.length; j++) {
-        //             if (reserveTimeList[j].equals(reserveDates.get(i).time)) {
-        //                 judge.add(reserveDates.get(i).time);
-        //             }
-        //         }
-        //     }
-        // }
-        for (ReserveDate reserveDate : reserveDates) {
-            if (date.isEqual(reserveDate.date)) {
-                if (reserveTimeList.contains(reserveDate.time)) {
-                    judge.add(reserveDate.time);
+        for (int i = 0; i < reserveDates.size(); i++) {
+            if (date.isEqual(reserveDates.get(i).date)) {
+                for (int j = 0; j < reserveTimeList.length; j++) {
+                    if (reserveTimeList[j].equals(reserveDates.get(i).time)) {
+                        judge.add(reserveDates.get(i).time);
+                    }
                 }
             }
         }
-//        judgeに格納された時間とreserveTimeListに同一の時間があるかを判定
-        // List<String> judge2 = new ArrayList<>();
-        // for (int i = 0; i < reserveTimeList.length; i++) {
-        //     if (judge.contains(reserveTimeList[i])) {
-        //         judge2.add("×");
-        //     } else {
-        //         judge2.add("予約可能です");
-        //     }
-        // }
+
+    //    judgeに格納された時間とreserveTimeListに同一の時間があるかを判定
         List<String> judge2 = new ArrayList<>();
-        for (LocalTime time : reserveTimeList) {
-            if (judge.contains(time)) {
+        for (int i = 0; i < reserveTimeList.length; i++) {
+            if (judge.contains(reserveTimeList[i])) {
                 judge2.add("×");
             } else {
                 judge2.add("予約可能です");
             }
         }
-    //     for (int i = 0; i < judge2.size(); i++) {
-    //         System.out.println(reserveTimeList[i] + "：" + judge2.get(i));
-    //         System.out.println("------------------------------");
-    //     }
-    //     return judge2;
-    // }
-    for (int i = 0; i < judge2.size(); i++) {
-        System.out.println(reserveTimeList.get(i) + "：" + judge2.get(i));
-        System.out.println("------------------------------");
+        for (int i = 0; i < judge2.size(); i++) {
+            System.out.println(reserveTimeList[i] + "：" + judge2.get(i));
+            System.out.println("------------------------------");
+        }
+        return judge2;
     }
-    return judge2;
-}
 
     //////////////////////////////////////////　予約キャンセル //////////////////////////////////////////
     //    reserveInfo.htmlから予約のキャンセルを処理
